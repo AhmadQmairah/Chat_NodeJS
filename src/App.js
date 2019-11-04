@@ -1,26 +1,49 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import connect from "socket.io-client";
+import "./App.css";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+  state = {
+    messages: ["Hello", "Yo", "Wassup"],
+    input: ""
+  };
+
+  componentDidMount() {
+    this.client = connect("http://127.0.0.1:8000/");
+
+    this.client.on("message", msg => {
+      let newMessage = this.state.messages;
+      newMessage.push(msg);
+      this.setState({ messages: newMessage });
+    });
+  }
+
+  submit(e) {
+    e.preventDefault();
+    // alert("Submitting", this.state.input);
+    this.client.send(this.state.input);
+    this.setState({ input: "" });
+  }
+  render() {
+    let messages = this.state.messages.map(msg => <li>{msg}</li>);
+
+    return (
+      <div className="App">
+        <ul id="messages">{messages}</ul>
+
+        <form onSubmit={e => this.submit(e)}>
+          <input
+            id="m"
+            autocomplete="off"
+            name="input"
+            value={this.state.input}
+            onChange={e => this.setState({ input: e.target.value })}
+          />
+          <button>Send</button>
+        </form>
+      </div>
+    );
+  }
 }
 
 export default App;
