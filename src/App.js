@@ -9,7 +9,7 @@ class App extends React.Component {
   };
 
   componentDidMount() {
-    this.client = connect("http://127.0.0.1:8000/");
+    this.client = connect("192.168.100.232");
 
     this.client.on("message", msg => {
       let newMessage = this.state.messages;
